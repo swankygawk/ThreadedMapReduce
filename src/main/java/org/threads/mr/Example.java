@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +36,8 @@ public class Example {
         MapReduce mapReduce = new MapReduce(INPUT_DIR, OUTPUT_DIR, N_WORKERS, M_REDUCERS, mapFunction, reduceFunction);
         mapReduce.execute(1L, TimeUnit.MINUTES);
 
-//        clearIntermediateFiles(); // uncomment to remove intermediate files
+        clearIntermediateFiles();
+//        cleanup();
     }
 
     private static void setupInputFiles() throws IOException {
@@ -60,10 +62,14 @@ public class Example {
         Path dir = Paths.get(path);
         if (Files.exists(dir)) {
             try (Stream<Path> dirStream = Files.walk(dir)) {
-                dirStream.forEach(p -> {
+                dirStream
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(p -> {
                     try {
                         Files.delete(p);
-                    } catch (IOException ignored) {}
+                    } catch (IOException e) {
+                        System.err.println("Error while cleaning up files: " + e.getMessage());
+                    }
                 });
             }
         }
@@ -75,7 +81,9 @@ public class Example {
                 .forEach(p -> {
                     try {
                         Files.delete(p);
-                    } catch (IOException ignored) {}
+                    } catch (IOException e) {
+                        System.err.println("Error while cleaning up files: " + e.getMessage());
+                    }
                 });
         }
     }
