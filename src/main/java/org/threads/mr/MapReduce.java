@@ -37,15 +37,14 @@ public class MapReduce {
             }
         } finally {
             executor.shutdown();
-        }
-
-        try {
-            if (!executor.awaitTermination(timeout, unit)) {
+            try {
+                if (!executor.awaitTermination(timeout, unit)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
                 executor.shutdownNow();
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 }
