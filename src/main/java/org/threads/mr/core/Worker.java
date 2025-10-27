@@ -63,7 +63,8 @@ public class Worker implements Runnable {
             }
 
             for (KeyValue pair : intermediatePairs) {
-                int bucket = Math.abs(pair.key().hashCode()) % mapTask.reduceTasksNumber();
+                // masking off the sign bit to avoid NPE if pair.key().hashCode() is Integer.MIN_VALUE
+                int bucket = (pair.key().hashCode() & 0x7fffffff) % mapTask.reduceTasksNumber();
                 buckets.get(bucket).add(pair);
             }
 
