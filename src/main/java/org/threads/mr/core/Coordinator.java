@@ -37,6 +37,13 @@ public class Coordinator {
         int reduceTasksNumber,
         int workersNumber
     ) {
+        if (reduceTasksNumber <= 0) {
+            throw new IllegalArgumentException("reduceTasksNumber must be greater than 0");
+        }
+        if (workersNumber <= 0) {
+            throw new IllegalArgumentException("workersNumber must be greater than 0");
+        }
+
         this.workersNumber = workersNumber;
 
         List<String> inputFiles = findInputFiles(inputPath);
@@ -101,8 +108,8 @@ public class Coordinator {
     }
 
     private List<String> findInputFiles(@NonNull String inputPath) {
-        try (Stream<Path> pathStream = Files.list(Paths.get(inputPath))) {
-            return pathStream
+        try (Stream<Path> paths = Files.list(Paths.get(inputPath))) {
+            return paths
                 .filter(Files::isRegularFile)
                 .map(Path::toString)
                 .toList();
