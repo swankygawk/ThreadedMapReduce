@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public class Worker implements Runnable {
@@ -94,13 +95,14 @@ public class Worker implements Runnable {
             Map<String, List<String>> groupedByKey = new TreeMap<>();
 
             for (String fileName : reduceTask.intermediateFiles()) {
-                Files.readAllLines(Paths.get(fileName)).forEach(line -> {
-                    String[] parts = line.split("\t", 2);
-                    if (parts.length == 2) {
-                        groupedByKey.computeIfAbsent(parts[0], k -> new ArrayList<>()).add(parts[1]);
-                    }
-                });
-
+                try (Stream<String> lines = Files.lines(Path.of(fileName))) {
+                    lines.forEach(line -> {
+                        String[] parts = line.split("\t", 2);
+                        if (parts.length == 2) {
+                            groupedByKey.computeIfAbsent(parts[0], k -> new ArrayList<>()).add(parts[1]);
+                        }
+                    });
+                }
             }
 
             List<String> outputLines = new ArrayList<>();
