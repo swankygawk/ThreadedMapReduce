@@ -65,11 +65,11 @@ public class Example {
                 dirStream
                     .sorted(Comparator.reverseOrder())
                     .forEach(p -> {
-                    try {
-                        Files.delete(p);
-                    } catch (IOException e) {
-                        System.err.println("Error while cleaning up files: " + e.getMessage());
-                    }
+                        try {
+                            Files.delete(p);
+                        } catch (IOException e) {
+                            System.err.println("Error while cleaning up files: " + e.getMessage());
+                        }
                 });
             }
         }
